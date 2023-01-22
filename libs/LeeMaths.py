@@ -1,4 +1,4 @@
-import LeeLibs as ll
+import libs.LeeLibs as ll
 sym = ll.sym
 
 version = 2

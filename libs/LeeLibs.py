@@ -748,3 +748,18 @@ def errorPlot(x, y, *argv, **kwargs):
         removed+=1
 
     plt.errorbar(x, y, yErrors, xErrors, *argv, **kwargs)
+
+
+def normalise(array):
+    output = []
+    largest = 0
+    for v in array:
+        if np.abs(v) > largest:
+            largest = np.abs(v)
+
+    if largest == 0:
+        return array
+
+    for v in array:
+        output.append(v/largest)
+    return output

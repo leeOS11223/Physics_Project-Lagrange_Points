@@ -19,6 +19,9 @@ class Unit:
     def __mul__(self, other):
         return Unit(self.value * other)
 
+    def __divmod__(self, other):
+        return Unit(self.value / other)
+
     def toSI(self):
         return self
 
