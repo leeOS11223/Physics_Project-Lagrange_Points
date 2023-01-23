@@ -49,9 +49,12 @@ class simulator:
 
             if not last == int(self.tickCount):
                 self.frameData.append(frameData)
+                for obj in self.objs:
+                    obj.addedFrameData(self.timeRes)
 
             for obj in self.objs:
                 obj.actionTick(self.timeRes)
+                obj.frame = self.frames
 
             if not last == int(self.tickCount):
                 last = int(self.tickCount)
@@ -67,19 +70,24 @@ class simulator:
     def setTimeResolution(self, timeRes):
         self.timeRes = timeRes
 
-    def plotResults(self, ftype = 'gif'):
-        fig = plt.figure()
+    def plotResults(self, ftype = 'gif', frameOverride = -1, ThreeDOverride = False, extraplot = None):
 
-        if self.dimensions > 2:
+        fig = plt.figure()
+        if self.dimensions > 2 or ThreeDOverride:
             ax = fig.add_subplot(projection='3d')
         else:
             ax = fig.add_subplot()
 
-        ani = animation.FuncAnimation(fig, ft.partial(self.animate, ax), blit=False, frames=self.frames)
 
-        ani.save("output."+ftype)
 
-    def animate(self, ax, i):
+        if not frameOverride == -1:
+            self.animate(ax, extraplot, frameOverride)
+            fig.show()
+        else:
+            ani = animation.FuncAnimation(fig, ft.partial(self.animate, ax, extraplot), blit=False, frames=self.frames)
+            ani.save("output."+ftype)
+
+    def animate(self, ax, extraplot, i):
         ax.clear()
 
         datax = []
@@ -92,14 +100,20 @@ class simulator:
             if self.dimensions > 2:
                 dataz.append(pos[2])
 
+        if not extraplot is None:
+            extraplot(ax, i)
+
         if self.dimensions > 2:
-            ax.plot(datax, datay, dataz, '.', color='black', marker='o')
+            ax.plot(datax, datay, dataz, '.', color='black', marker='o', zorder=10)
         else:
-            ax.plot(datax, datay, '.', color='black', marker='o')
+            ax.plot(datax, datay, '.', color='black', marker='o', zorder=10)
+
+
+
         ax.set_xlim(self.outputRegion[0])
         ax.set_ylim(self.outputRegion[1])
-        if self.dimensions > 2:
-            ax.set_zlim(self.outputRegion[2])
+        #if self.dimensions > 2:
+        ax.set_zlim(self.outputRegion[2])
 
         return ax,
 
@@ -112,11 +126,15 @@ class simulatable:
         self.simulationSpace = None
         self.isDestroyed = False
         self.doNotPlot = False
+        self.frame = 0
 
     def setSimulator(self, sim: simulator):
         self.simulationSpace = sim
 
     def tick(self, timeRes):
+        pass
+
+    def addedFrameData(self, timeRes):
         pass
 
     def actionTick(self, timeRes):

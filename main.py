@@ -21,7 +21,10 @@ class obj(sim.body):
 
     def getOtherObjects(self):
         sbs = self.simulationSpace.objs.copy()
-        sbs.remove(self)
+
+        if self in sbs:
+            sbs.remove(self)
+
         for o in sbs:
             if o.isDestroyed:
                 sbs.remove(o)
@@ -51,52 +54,112 @@ class obj(sim.body):
                 if len(a) <= i:
                     a.append(0)
                 a[i] += t[i]
-        print(a)
+        #print(a)
         self.nextAcceleration = a
 
     def actionTick(self, timeRes):
         if self.isDestroyed: return
         self.setAcceleration(self.nextAcceleration)
 
-class lagrangeSampler(obj):
-    def __new__(cls, sampleRange):
+class gravitySampler(obj):
+    def __new__(cls, simSpace, sampleRange):
         return super().__new__(cls, 0)
 
-    def __init__(self, sampleRange):
-        super().__init__(0)
+    def __init__(self, simSpace, sampleRange):
+        super().__init__(1)
         self.static = True
         self.doNotPlot = True
         self.isDestroyed = True
         self.sampleRange = sampleRange
+        self.setSimulator(simSpace)
+        self.last = -1
 
-    def actionTick(self, timeRes):
-        pass
+    def getGravityVector(self, pos):
+        self.setPosition(pos)
+        a = []
+        for other in self.getOtherObjects():
+            t = self.forceToAcceleration(self.calculateForceOfGravityBetweenTwoBodies(other))
+            for i in range(self.getDimensions()):
+                if len(a) <= i:
+                    a.append(0)
+                a[i] += t[i]
+        return a
+
+    def getGravityStrength(self, pos):
+        strength = self.getGravityVector(pos)
+
+        i = 0
+        for d in range(self.getDimensions()):
+            i += strength[d]**2
+
+        if np.abs(i) > 5:
+            return 10
+        return np.sqrt(i)
+
+    def getField(self, sampleSize = 1):
+        outx = np.linspace(self.sampleRange[0][0],self.sampleRange[0][1], sampleSize)
+        outy = np.linspace(self.sampleRange[1][0],self.sampleRange[1][1], sampleSize)
+        outz = []
+
+        global star
+
+        for x in outx:
+            az = []
+            for y in outy:
+                strength = self.getGravityStrength([x, y])
+
+                spinning = - self.getDistance(star) * 0.4
+
+                az.append(strength - spinning)
+            outz.append(az)
+
+        return [np.array(outx), np.array(outy), np.array(outz)]
+
+    def addedFrameData(self, timeRes):
+        global fielddata
+        fielddata.append(s.getField(20))
+
+
+fielddata = []
+star = None
+
+def extraplot(ax, i):
+    x, y = np.meshgrid(fielddata[i][0], fielddata[i][1])
+    #print(fielddata[0])
+    #mycmap = ll.plt.get_cmap('gist_earth')
+    ax.plot_surface(y, x,-fielddata[i][2], zorder=-100)#, cmap=mycmap) #plot_wireframe
+
 
 r = Sun_Earth_distance*1.2
 
 simSpace = sim.simulator()
-simSpace.setCondition(sim.tickLimitCondition(32))
-simSpace.setTimeResolution(0.1)
+simSpace.setCondition(sim.tickLimitCondition(0))
+simSpace.setTimeResolution(1)
 #simSpace.outputRegion= [[-r,r],[-r,r],[-r,r]]
 
-simSpace.dimensions = 3
+simSpace.dimensions = 2
 
-o = obj(10)
-o.static = True
-simSpace.add(o)
+star = obj(10)
+star.setPosition([0, 1, 0])
+star.static = True
+simSpace.add(star)
 
 o2 = obj(1)
-o2.setPosition([0, 3, 0])
+o2.setPosition([0, -2, 0])
 o2.setVelocity([-0.740159, -0.2245, 0])
 simSpace.add(o2)
 
+r = 5
+s = gravitySampler(simSpace, [[-r,r],[-r,r],[-r,r]])
+simSpace.add(s)
+#fielddata = s.getField(15)
+#print(fielddata)
 
-s = lagrangeSampler([[-50,50],[-50,50],[-50,50]])
-#simSpace.add(s)
 
 
 simSpace.run()
-simSpace.plotResults('gif')
+#simSpace.plotResults(frameOverride=0, ThreeDOverride = True, extraplot=extraplot)
+simSpace.plotResults(ThreeDOverride = True, extraplot=extraplot)
 
 
 
