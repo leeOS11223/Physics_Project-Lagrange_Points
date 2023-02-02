@@ -149,6 +149,11 @@ o2.setPosition([0, -2, 0])
 o2.setVelocity([-0.740159, -0.2245, 0])
 simSpace.add(o2)
 
+#o3 = obj(3)
+#o3.setPosition([-4, -2, 0])
+#o3.setVelocity([-0.740159, -0.2245, 0])
+#simSpace.add(o3)
+
 r = 5
 s = gravitySampler(simSpace, [[-r,r],[-r,r],[-r,r]])
 simSpace.add(s)
