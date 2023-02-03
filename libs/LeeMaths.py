@@ -167,7 +167,7 @@ class expression:
     def differentiate(self, withRespect=None, evaluate=True):
         if withRespect is None:
             withRespect = exp("x")
-        withRespect="var_"+withRespect
+        #withRespect=withRespect
         return exp(expression=sym.diff(self.expression, withRespect.expression, evaluate=evaluate))
     diff = differentiate
 
