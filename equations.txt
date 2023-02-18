@@ -1,0 +1,93 @@
+x^\prime=x\cos{\theta}+y\sin{\theta}
+y^\prime=-x\sin{\theta}+y\cos{\theta}
+ 
+T=\frac{1}{2}m\left({\dot{x}}^{\prime2}+{\dot{y}}^{\prime2}\right)
+ 
+{\dot{x}}^\prime=\dot{x}\cos{\theta}+\dot{y}\sin{\theta}+\dot{\theta}\left(-x\sin{\theta}+y\cos{\theta}\right)
+{\dot{y}}^\prime=-\dot{x}\sin{\theta}+\dot{y}\cos{\theta}+\dot{\theta}\left(-x\cos{\theta}-y\sin{\theta}\right)
+ 
+\theta=\omega\ t
+\dot{\theta}=\omega
+ 
+\left({\dot{x^\prime}}^2+{{\dot{y}}^\prime}^2\right)={\dot{x}}^2+{\dot{y}}^2+\omega^2\left(x^2+y^2\right)-2\omega\dot{x}y+2\omega\ x\dot{y}=\left(\dot{x}+\omega y\right)^2+\left(\dot{y}-\omega x\right)^2
+ 
+L=T-V
+ 
+L=\frac{m}{2}\left[\left(\dot{x}+\omega y\right)^2+\left(\dot{y}-\omega x\right)^2\right]-V\left(x,y\right)
+ 
+\frac{\partial L}{\partial\dot{x}}=m\dot{x}-m\omega\ y
+\frac{\partial L}{\partial x}=m\omega^2x+m\omega\dot{y}-\frac{\partial V}{\partial x}
+ 
+\frac{\partial L}{\partial\dot{y}}=m\dot{y}+m\omega\ x
+\frac{\partial L}{\partial y}=m\omega^2y-m\omega\dot{x}-\frac{\partial V}{\partial y}
+ 
+ 
+\frac{d}{dt}\left(\frac{\partial L}{\partial\dot{x}}\right)=\frac{\partial L}{\partial x}
+\frac{d}{dt}\left(\frac{\partial L}{\partial\dot{y}}\right)=\frac{\partial L}{\partial y}
+ 
+m\ddot{x}-m\omega\dot{y}=m\omega^2x+m\omega\dot{y}-\frac{\partial V}{\partial x}
+m\ddot{y}+m\omega\dot{x}=m\omega^2y-m\omega\dot{x}-\frac{\partial V}{\partial y}
+ 
+ 
+ 
+m\ddot{x}=m\omega^2x+2m\omega\dot{y}-\frac{\partial V}{\partial x}
+m\ddot{y}=m\omega^2y-2m\omega\dot{x}-\frac{\partial V}{\partial y}\ 
+ 
+m\ddot{x}=\frac{\partial}{\partial x}\left[\frac{m\omega^2x^2}{2}\right]+2m\omega\dot{y}-\frac{\partial V}{\partial x}
+m\ddot{y}=\frac{\partial}{\partial y}\left[\frac{m\omega^2y^2}{2}\right]-2m\omega\dot{x}-\frac{\partial V}{\partial y}\ 
+ 
+ 
+V_{eff}=V_{gravity}+V_{centrifugal}
+ 
+m\ddot{x}=-\frac{\partial}{\partial x}\left[-\frac{m\omega^2x^2}{2}\right]+2m\omega\dot{y}-\frac{\partial V_{eff}}{\partial x}
+m\ddot{y}=-\frac{\partial}{\partial y}\left[-\frac{m\omega^2y^2}{2}\right]-2m\omega\dot{x}-\frac{\partial V_{eff}}{\partial y}\ 
+ 
+V_{centrifugal}=-\frac{m\omega^2x^2}{2}-\frac{m\omega^2y^2}{2}
+V_{centrifugal}=-\frac{1}{2}m\omega^2\left[x^2+y^2\right]
+ 
+m\ddot{x}=2m\omega\dot{y}-\frac{\partial V_{eff}}{\partial x}
+m\ddot{y}=-2m\omega\dot{x}-\frac{\partial V_{eff}}{\partial y}\ 
+
+
+F=G\frac{m_1m_2}{r^2}
+U=-G\frac{m_1m_2}{r}
+ 
+U_1=-G\frac{m_1m}{r}
+U_1=-G\frac{m_1m}{\sqrt{\left(x--u\right)^2+y^2}}
+U_1=-G\frac{m_1m}{\sqrt{\left(x+u\right)^2+y^2}}
+ 
+U_2=-G\frac{m_2m}{r}
+U_2=-G\frac{m_2m}{\sqrt{\left(x+u-1\right)^2+y^2}}
+ 
+U=-G\frac{m_1m}{\sqrt{\left(x+u\right)^2+y^2}}-G\frac{m_2m}{\sqrt{\left(x+u-1\right)^2+y^2}}
+V_{gravity}=U=-G\left(\frac{m_1m}{\sqrt{\left(x+u\right)^2+y^2}}+\frac{m_2m}{\sqrt{\left(x+u-1\right)^2+y^2}}\right)
+
+V_{centrifugal}=-\frac{1}{2}m\omega^2\left[x^2+y^2\right]
+ 
+m\ddot{x}=2m\omega\dot{y}-\frac{\partial V_{eff}}{\partial x}
+m\ddot{y}=-2m\omega\dot{x}-\frac{\partial V_{eff}}{\partial y}\ 
+ 
+V_{eff}=V_{gravity}+V_{centrifugal}
+V_{eff}=-G\left(\frac{m_1m}{\sqrt{\left(x+u\right)^2+y^2}}+\frac{m_2m}{\sqrt{\left(x+u-1\right)^2+y^2}}\right)-\frac{1}{2}m\omega^2\left[x^2+y^2\right]
+ 
+Pull out m, mass of the third body
+V_{eff}=-Gm\left(\frac{m_1}{\sqrt{\left(x+u\right)^2+y^2}}+\frac{m_2}{\sqrt{\left(x+u-1\right)^2+y^2}}\right)-\frac{1}{2}\omega^2\left[x^2+y^2\right]
+V_{eff}=-G\left(\frac{m_1}{\sqrt{\left(x+u\right)^2+y^2}}+\frac{m_2}{\sqrt{\left(x+u-1\right)^2+y^2}}\right)-\frac{1}{2}\omega^2\left[x^2+y^2\right]
+m\ddot{x}=2m\omega\dot{y}-m\frac{\partial V_{eff}}{\partial x}
+m\ddot{y}=-2m\omega\dot{x}-m\frac{\partial V_{eff}}{\partial y}\ 
+ 
+V_{eff}=-G\left(\frac{m_1}{\sqrt{\left(x+u\right)^2+y^2}}+\frac{m_2}{\sqrt{\left(x+u-1\right)^2+y^2}}\right)-\frac{1}{2}\omega^2\left[x^2+y^2\right]
+\ddot{x}=2\omega\dot{y}-\frac{\partial V_{eff}}{\partial x}
+\ddot{y}=-2\omega\dot{x}-\frac{\partial V_{eff}}{\partial y}\ 
+ 
+Use unitless units \therefore G=1
+Also \omega=1
+m_1=1-u
+m_2=u
+ 
+V_{eff}=-\frac{1}{2}\left(x^2+y^2\right)-\frac{1-u}{\sqrt{\left(x+u\right)^2+y^2}}-\frac{u}{\sqrt{\left(x+u-1\right)^2+y^2}}
+\ddot{x}=-\frac{\partial V_{eff}}{\partial x}+2\dot{y}
+\ddot{y}=-\frac{\partial V_{eff}}{\partial y}\ -2\dot{x}
+ 
+QED
+

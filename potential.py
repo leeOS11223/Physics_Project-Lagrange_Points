@@ -14,12 +14,12 @@ mass_saturn = 5.683 * 10 ** 26
 m1 = mass_jupiter
 m2 = mass_saturn
 
-u = 1 #m2 / (m1 + m2)
+u = 0.4  # m2 / (m1 + m2)
 
 ThreeD = False
 mode = 2
-zoom = 1.2
-res = 0.01  # contour resolution
+zoom = 1#1.2
+res = 0.01 * zoom**2  # contour resolution
 N = 1000  # number of contour lines
 
 VeffEqdx = VeffEq.diff()
@@ -103,9 +103,9 @@ if not ThreeD:
 #     ax.axvline(0, color='black')
 #     ax.axhline(0, color='black')
 
-#initial1 = [0.265, 0.867, 0, 0]
-#states1 = odeint(f, initial1, t)
-#flow1 = ax.plot(states1[:, 0], states1[:, 1], '', color='orange', zorder=100)[0]
+# initial1 = [0.265, 0.867, 0, 0]
+# states1 = odeint(f, initial1, t)
+# flow1 = ax.plot(states1[:, 0], states1[:, 1], '', color='orange', zorder=100)[0]
 
 # for x in np.arange(-1,1,0.4):
 #     for y in np.arange(-1,1,0.4):
@@ -120,15 +120,15 @@ ax.plot(-u, 0, 'ro', zorder=100)
 ax.plot(1 - u, 0, 'ro', zorder=100)
 
 plt.title("u=" + str(u))
-          # + ", pos=(" + str(initial1[0]) + ", " + str(initial1[1]) + ")"
-          # + ", vel=(" + str(initial1[2]) + ", " + str(initial1[3]) + ")")
+# + ", pos=(" + str(initial1[0]) + ", " + str(initial1[1]) + ")"
+# + ", vel=(" + str(initial1[2]) + ", " + str(initial1[3]) + ")")
 
 data = []
 xd = []
 yd = []
 
-plt.xlim(-2, 2)
-plt.ylim(-1.5, 1.5)
+plt.xlim(-2*zoom, 2*zoom)
+plt.ylim(-1.5*zoom, 1.5*zoom)
 
 r = [[plt.xlim()[0] * zoom, plt.ylim()[0] * zoom], [plt.xlim()[1] * zoom, plt.ylim()[1] * zoom]]
 
@@ -142,31 +142,42 @@ for x in np.arange(r[0][0], r[1][0] + 0.0001, res):
         xd[ix].append(x)
         yd[ix].append(y)
 
-        if mode == 1:
-            dx = np.abs(VeffdxHard(x, y, u))
-            dy = np.abs(VeffdyHard(x, y, u))
+        # if mode == 1:
+        #     dx = np.abs(VeffdxHard(x, y, u))
+        #     dy = np.abs(VeffdyHard(x, y, u))
+        #
+        #     a = 0
+        #     if dx < 0.04 and dy < 0.04:
+        #         a = 5
+        #     elif dx < 0.08 and dy < 0.08:
+        #         a = 10
+        #     elif dx < 0.12 and dy < 0.12:
+        #         a = 15
+        #     elif dx < 0.16 and dy < 0.16:
+        #         a = 20
+        #     data[ix].append(a)
+        # elif mode == 2:
+        #     a = D(x, y, u)  # * 10
+        #     if not ThreeD:
+        #         a = 10 ** a
+        #         if a < -100:
+        #             a = -100
+        #         elif a > 100:
+        #             a = 100
+        #     data[ix].append(a)
 
-            a = 0
-            if dx < 0.04 and dy < 0.04:
-                a = 5
-            elif dx < 0.08 and dy < 0.08:
-                a = 10
-            elif dx < 0.12 and dy < 0.12:
-                a = 15
-            elif dx < 0.16 and dy < 0.16:
-                a = 20
-            data[ix].append(a)
-        elif mode == 2:
-            a = D(x, y, u)  # * 10
-            if not ThreeD:
-                a = 10 ** a
-                if a < -100:
-                    a = -100
-                elif a > 100:
-                    a = 100
-            data[ix].append(a)
+        a = VeffHard(x, y, u)
 
-        # data[ix].append(VeffdxHard(x, y, u) * VeffdyHard(x, y, u))
+        if a > 5:
+            a = 5
+        elif a < -5:
+            a = -5
+
+        # if a < -5100:
+        #     print(a)
+        #     a = -5100
+
+        data[ix].append(a)
         iy += 1
     ix += 1
 
