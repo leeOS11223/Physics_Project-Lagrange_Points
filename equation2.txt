@@ -1,0 +1,6 @@
+V_x,\ V_y,\ x,\ y
+
+\dot{x}=v_x
+\dot{y}=v_y
+{\dot{v}}_x=-\frac{\delta V_{eff}}{\delta x}+2v_y
+{\dot{v}}_y=-\frac{\delta V_{eff}}{\delta y}-2v_x

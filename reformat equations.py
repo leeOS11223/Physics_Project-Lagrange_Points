@@ -1,5 +1,5 @@
 # equations is stored locally in the file equations.txt
-path = "equations.txt"
+path = "equation2.txt"
 equations = open(path, "r").read()
 
 # file is in windows-1252
@@ -26,5 +26,5 @@ for line in equations.splitlines():
     output += "\n"
 
 # write the output to the file equations new.txt
-open("equations new.txt", "w").write(output)
+open("equations2 new.txt", "w").write(output)
 

@@ -85,7 +85,7 @@ def D(x, y, u):
 
 def f(state, t):
     x, y, v_x, v_y = state  # unpack state vector
-    global u
+    global u # constant
 
     xdot = v_x
     ydot = v_y
