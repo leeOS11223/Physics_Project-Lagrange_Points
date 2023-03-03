@@ -199,14 +199,8 @@ if ThreeD:
     ax.grid(False)
     ax.axis('off')
     plt.title("")
-    # RADIUS = 2.4
-    # ax.set_xlim3d(-RADIUS / 2, RADIUS / 2)
-    # ax.set_zlim3d(-RADIUS / 2, RADIUS / 2)
-    # ax.set_ylim3d(-RADIUS / 2, RADIUS / 2)
 
     ax.view_init(elev=30, azim=260)
-    #ax.view_init(elev=90, azim=260)
-
 
     ax.plot_surface(xd, yd, np.array(data), cmap=plt.cm.tab20b, zorder=-100, antialiased=False)
 
