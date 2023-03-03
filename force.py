@@ -1,7 +1,10 @@
+import math
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_ivp, odeint
 import libs.LeeMaths as lm
+import libs.LeeLibs as ll
 from scipy.signal import argrelextrema
 from scipy.signal import find_peaks
 
@@ -16,10 +19,14 @@ mass_saturn = 5.683 * 10 ** 26
 m1 = mass_jupiter
 m2 = mass_saturn
 
-u = 0.2  # m2 / (m1 + m2)
+u = 0.4  # m2 / (m1 + m2)
 finderCutOff = 16
+finder = True
 frameV = [0, 0]
 simulationTime = 30
+thirdBodyFromLagrangePoints = False
+normalThirdBodySimulation = False
+
 
 ThreeD = False
 mode = 1
@@ -108,9 +115,10 @@ if not ThreeD:
 #     ax.axvline(0, color='black')
 #     ax.axhline(0, color='black')
 
-# initial1 = [1.1, -0.1, 0.1, 0.1]
-# states1 = odeint(f, initial1, t)
-# flow1 = ax.plot(states1[:, 0], states1[:, 1], '', color='orange', zorder=100)[0]
+if normalThirdBodySimulation:
+    initial1 = [0.4, 0.9, 0, 0]
+    states1 = odeint(f, initial1, t)
+    flow1 = ax.plot(states1[:, 0], states1[:, 1], '', color='orange', zorder=100)[0]
 
 # for x in np.arange(-1,1,0.4):
 #     for y in np.arange(-1,1,0.4):
@@ -127,9 +135,12 @@ ax.plot(1 - u, 0, 'ro', zorder=100)
 if not frameV == [0, 0]:
     plt.title("u=" + str(u) + ", frameV=" + str(frameV))
 else:
-    plt.title("u=" + str(u))
-# + ", pos=(" + str(initial1[0]) + ", " + str(initial1[1]) + ")"
-# + ", vel=(" + str(initial1[2]) + ", " + str(initial1[3]) + ")")
+    if normalThirdBodySimulation:
+        plt.title("u=" + str(u)
+         + ", pos=(" + str(initial1[0]) + ", " + str(initial1[1]) + ")"
+         + ", vel=(" + str(initial1[2]) + ", " + str(initial1[3]) + ")")
+    else:
+        plt.title("u=" + str(u))
 
 data = []
 xd = []
@@ -237,7 +248,7 @@ def walk(data, point1, point2):
         for xx in range(-2, 3):
             for yy in range(-2, 3):
                 next = [current[0] + xx, current[1] + yy]
-                if not data[next[0]][next[1]] < 16:
+                if not data[next[0]][next[1]] < finderCutOff: #16
                     if not (stack.__contains__(next) or doneStack.__contains__(next)):
                         stack.append(next)
                 if doneStack.__contains__(point2): return True
@@ -264,63 +275,120 @@ def walk(data, point1, point2):
 
     return doneStack.__contains__(point2)
 
+if finder:
+    xpeaks = []
+    ypeaks = []
+    for y in range(np.shape(data)[0]):
+        # y=int(len(b)/2)
+        peaks, _ = find_peaks(b[y], height=finderCutOff)
+        for peak in peaks:
+            xpeaks.append([y, peak])
+            # ax.plot(xd[y][peak], yd[y][peak], 'b.', zorder=100)
 
-xpeaks = []
-ypeaks = []
-for y in range(np.shape(data)[0]):
-    # y=int(len(b)/2)
-    peaks, _ = find_peaks(b[y], height=finderCutOff)
+    for y in range(np.shape(data)[1]):
+        peaks, _ = find_peaks(b.transpose()[y], height=finderCutOff)
+        for peak in peaks:
+            ypeaks.append([peak, y])
+            # ax.plot(xd[peak][y], yd[peak][y], 'y.', zorder=100)
+
+    peaks = []
+
+    for peak in xpeaks:
+        if ypeaks.__contains__(peak):
+            peaks.append(peak)
+
+    print(len(peaks))
+
+    newpeaks = peaks.copy()
+
+    i = 0
+    for peak1 in newpeaks:
+        i += 1
+        for peak2 in newpeaks:
+            if peak2 is None: continue
+            if peak1 is None: break
+            if not peak1 == peak2:
+                walked = walk(b, peak1, peak2)
+                if walked:
+                    peak1V = b[peak1[0], peak1[1]]
+                    peak2V = b[peak2[0], peak2[1]]
+
+                    if peak1V > peak2V:
+                        newpeaks[newpeaks.index(peak2)] = None
+                    else:
+                        newpeaks[newpeaks.index(peak1)] = None
+                        break
+
+        print(str(int(i / (len(newpeaks)) * 100)) + "%")
+
+    peaks = []
+    for peak in newpeaks:
+        if not peak is None:
+            peaks.append(peak)
+
+    lpoints = [["name","x","y"]]
+
     for peak in peaks:
-        xpeaks.append([y, peak])
-        # ax.plot(xd[y][peak], yd[y][peak], 'b.', zorder=100)
+        ax.plot(xd[peak[0]][peak[1]], yd[peak[0]][peak[1]], 'r.', zorder=100)
 
-for y in range(np.shape(data)[1]):
-    peaks, _ = find_peaks(b.transpose()[y], height=finderCutOff)
-    for peak in peaks:
-        ypeaks.append([peak, y])
-        # ax.plot(xd[peak][y], yd[peak][y], 'y.', zorder=100)
+        posx,posy = xd[peak[0]][peak[1]], yd[peak[0]][peak[1]]
 
-peaks = []
+        # round to nearest 4 dp
+        posx = round(posx * 10000) / 10000
+        posy = round(posy * 10000) / 10000
 
-for peak in xpeaks:
-    if ypeaks.__contains__(peak):
-        peaks.append(peak)
+        lpoints.append(["",posx,posy])
 
-print(len(peaks))
+        print(posx,posy)
 
-newpeaks = peaks.copy()
+        if thirdBodyFromLagrangePoints:
+            initial1 = [xd[peak[0]][peak[1]], yd[peak[0]][peak[1]], frameV[0], frameV[1]]
+            states1 = odeint(f, initial1, t)
+            flow1 = ax.plot(states1[:, 0], states1[:, 1], '', zorder=100)[0]
 
-i = 0
-for peak1 in newpeaks:
-    i += 1
-    for peak2 in newpeaks:
-        if peak2 is None: continue
-        if peak1 is None: break
-        if not peak1 == peak2:
-            walked = walk(b, peak1, peak2)
-            if walked:
-                peak1V = b[peak1[0], peak1[1]]
-                peak2V = b[peak2[0], peak2[1]]
+    # label each point  L1, L2, L3, L4, L5
+    # L1 if its in the centre
+    # L2 if its in the right
+    # L3 if its in the left
+    # L4 if its in the top
+    # L5 if its in the bottom
+    # Create a list of tuples containing the indices and coordinates of each point
+    points = []
+    for i, point in enumerate(lpoints[1:]):
+        x, y = point[1], point[2]
+        points.append((i, x, y))
 
-                if peak1V > peak2V:
-                    newpeaks[newpeaks.index(peak2)] = None
-                else:
-                    newpeaks[newpeaks.index(peak1)] = None
-                    break
+    # Sort the points by x-coordinate
+    points.sort(key=lambda p: p[1])
 
-    print(str(int(i / (len(newpeaks)) * 100)) + "%")
+    # Label the points
+    for i, point in enumerate(points):
+        idx, x, y = point
+        if i == 0:
+            lpoints[idx+1][0] = "L3"
+        elif i == len(points) - 1:
+            lpoints[idx+1][0] = "L2"
+        else:
+            lpoints[idx+1][0] = ""
 
-peaks = []
-for peak in newpeaks:
-    if not peak is None:
-        peaks.append(peak)
+    points.sort(key=lambda p: p[2])
 
-for peak in peaks:
-    ax.plot(xd[peak[0]][peak[1]], yd[peak[0]][peak[1]], 'r.', zorder=100)
+    # Label the points
+    for i, point in enumerate(points):
+        idx, x, y = point
+        if i == 0:
+            lpoints[idx+1][0] = "L5"
+        elif i == len(points) - 1:
+            lpoints[idx+1][0] = "L4"
+        else:
+            if lpoints[idx+1][0] == "":
+                lpoints[idx+1][0] = "L1"
 
-    initial1 = [xd[peak[0]][peak[1]], yd[peak[0]][peak[1]], frameV[0], frameV[1]]
-    states1 = odeint(f, initial1, t)
-    flow1 = ax.plot(states1[:, 0], states1[:, 1], '', zorder=100)[0]
+    lpoints = ll.toDataObject(lpoints)
+
+    print(lpoints.asLatexTable("A table showing the positions of the the lagrangian points"))
+    print()
+    print(lpoints.toArray())
 
 if not ThreeD:
     ax.contourf(xd, yd, data, N, extend='both')  # , colors=['#808080', '#A0A0A0', '#C0C0C0'])

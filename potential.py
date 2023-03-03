@@ -16,10 +16,11 @@ m2 = mass_saturn
 
 u = 0.4  # m2 / (m1 + m2)
 
-ThreeD = False
+ThreeD = True
 mode = 2
 zoom = 1#1.2
-res = 0.01 * zoom**2  # contour resolution
+res = 0.005 * zoom**2  # contour resolution
+#res = 0.01 * zoom**2
 N = 1000  # number of contour lines
 
 VeffEqdx = VeffEq.diff()
@@ -184,7 +185,29 @@ for x in np.arange(r[0][0], r[1][0] + 0.0001, res):
 if not ThreeD:
     ax.contourf(xd, yd, data, N, extend='both')  # , colors=['#808080', '#A0A0A0', '#C0C0C0'])
 
+
+pointData = [['name', 'x', 'y'], ['L3', -1.16, 0.0], ['L5', 0.09, -0.87], ['L4', 0.09, 0.87], ['L1', 0.14, 0.0], ['L2', 1.23, 0.0]]
+pointData = lm.ll.toDataObject(pointData)
+
+for point in pointData[:,1:]:
+    print(point)
+    ax.plot(point[1], point[2], '.', zorder=100, label = point[0])
+
+plt.legend()
+
 if ThreeD:
-    ax.plot_surface(xd, yd, np.array(data), zorder=-100)
+    ax.grid(False)
+    ax.axis('off')
+    plt.title("")
+    # RADIUS = 2.4
+    # ax.set_xlim3d(-RADIUS / 2, RADIUS / 2)
+    # ax.set_zlim3d(-RADIUS / 2, RADIUS / 2)
+    # ax.set_ylim3d(-RADIUS / 2, RADIUS / 2)
+
+    ax.view_init(elev=30, azim=260)
+    #ax.view_init(elev=90, azim=260)
+
+
+    ax.plot_surface(xd, yd, np.array(data), cmap=plt.cm.tab20b, zorder=-100, antialiased=False)
 
 plt.show()
